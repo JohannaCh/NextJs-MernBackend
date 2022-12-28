@@ -1,4 +1,4 @@
-export default function validateMiddleware(validations, validationResult) {
+export default function checkValidations(validations, validationResult) {
     return async (req, res, next) => {
       await Promise.all(validations.map((validation) => validation.run(req)))
   

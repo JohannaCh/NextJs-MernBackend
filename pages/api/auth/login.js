@@ -1,14 +1,14 @@
 import { validationResult } from 'express-validator'
 import User from '../../../models/User';
 import initMiddleware from '../../../middleware/initMiddleware';
-import registerForm from '../../../middleware/registerForm';
+import loginForm from '../../../middleware/loginForm';
 import validateMiddleware from '../../../middleware/validateFields';
 import dbConnect from '../../../lib/dbConnect';
 import { generateJWT } from '../../../helpers/jwt';
 const bcrypt = require('bcryptjs');
 
 const validateBody = initMiddleware(
-    validateMiddleware(registerForm, validationResult)
+    validateMiddleware(loginForm, validationResult)
 )
 
 export default async function handler(req, res) {
@@ -16,39 +16,38 @@ export default async function handler(req, res) {
 
     const { email, password } = req.body;
     await dbConnect();
-
         try {
-            let user = await User.findOne({email: email});
-            if (user) {
+            const user = await User.findOne({email: email});
+            if (!user) {
                 return res.status(400).json({
                     ok:false,
-                    msg:'Ya existe un registro con ese email'
+                    msg:'Datos incorrectos'
                 })
             }
 
-            user = new User(req.body);
+            //comparar pass
+            const validatePass = bcrypt.compareSync(password, user.password);
 
-            //encriptar contraseña
-            const salt = bcrypt.genSaltSync();
-            user.password = bcrypt.hashSync(password, salt);
+            if (!validatePass) {
+                return res.status(400).json({
+                    ok:false,
+                    msg:'Contraseña incorrecta'
+                })
+            }
 
-            await user.save();
-
-            //generar JWT
+            //generar el JWT
             const token = await generateJWT(user.id, user.name);
-    
-            res.status(201).json({
+            
+            res.status(200).json({
                 ok:true,
-                uid:user.id,
-                name:user.name,
+                msg:'Login Exitoso',
                 token
             });
 
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 ok:false,
-                msg:'Fallo el registro',
-            });
+                msg:'Fallo el inicio de sesion'
+            })
         }
 }
