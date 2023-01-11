@@ -1,7 +1,6 @@
 import { validationResult } from 'express-validator'
 import User from '../../../models/User';
 import initMiddleware from '../../../middleware/initMiddleware';
-import {initCors} from '../../../middleware/cors';
 import loginForm from '../../../middleware/loginForm';
 import validateMiddleware from '../../../middleware/validateFields';
 import dbConnect from '../../../lib/dbConnect';
@@ -17,9 +16,21 @@ const validateBody = initMiddleware(
     validateMiddleware(loginForm, validationResult)
 )
 
+function runMiddleware(req, res, fn) {
+    return new Promise((resolve, reject) => {
+      fn(req, res, (result) => {
+        if (result instanceof Error) {
+          return reject(result)
+        }
+        return resolve(result)
+      })
+    })
+}
+
 export default async function handler(req, res) {
 
-    await initCors(req, res, cors)
+    // await initCors(req, res, cors);
+    await runMiddleware(req, res, cors);
     await validateBody(req, res);
 
     const { email, password } = req.body;
