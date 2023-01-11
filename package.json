@@ -10,19 +10,19 @@
   },
   "dependencies": {
     "@next/font": "13.0.7",
-    "eslint": "8.30.0",
-    "eslint-config-next": "13.0.7",
-    "next": "13.0.7",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
+    "eslint": "8.30.0",
+    "eslint-config-next": "13.0.7",
     "express": "^4.18.2",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.4",
     "mongoose": "^6.7.4",
-    "nodemon": "^2.0.20"
+    "next": "13.0.7",
+    "nodemon": "^2.0.20",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   }
 }

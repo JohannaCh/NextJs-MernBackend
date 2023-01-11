@@ -1,17 +1,25 @@
 import { validationResult } from 'express-validator'
 import User from '../../../models/User';
 import initMiddleware from '../../../middleware/initMiddleware';
+import {initCors} from '../../../middleware/cors';
 import loginForm from '../../../middleware/loginForm';
 import validateMiddleware from '../../../middleware/validateFields';
 import dbConnect from '../../../lib/dbConnect';
 import { generateJWT } from '../../../helpers/jwt';
+import Cors from 'cors'
 const bcrypt = require('bcryptjs');
+
+const cors = Cors({
+    methods: ['POST', 'HEAD'],
+  })
 
 const validateBody = initMiddleware(
     validateMiddleware(loginForm, validationResult)
 )
 
 export default async function handler(req, res) {
+
+    await initCors(req, res, cors)
     await validateBody(req, res);
 
     const { email, password } = req.body;
