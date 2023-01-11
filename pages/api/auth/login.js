@@ -16,7 +16,7 @@ const validateBody = initMiddleware(
     validateMiddleware(loginForm, validationResult)
 )
 
-function runMiddleware(req, res, fn) {
+function checkCors(req, res, fn) {
     return new Promise((resolve, reject) => {
       fn(req, res, (result) => {
         if (result instanceof Error) {
@@ -29,8 +29,7 @@ function runMiddleware(req, res, fn) {
 
 export default async function handler(req, res) {
 
-    // await initCors(req, res, cors);
-    await runMiddleware(req, res, cors);
+    await checkCors(req, res, cors);
     await validateBody(req, res);
 
     const { email, password } = req.body;

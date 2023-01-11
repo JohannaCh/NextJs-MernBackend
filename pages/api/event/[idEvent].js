@@ -4,14 +4,30 @@ import validateMiddleware from '../../../middleware/validateFields';
 import initMiddleware from '../../../middleware/initMiddleware';
 import validateJWT from '../../../middleware/validateJWT';
 import Event from '../../../models/Event';
+import Cors from 'cors'
 import dbConnect from '../../../lib/dbConnect';
 
+const cors = Cors({
+    methods: ['GET','PUT','DELETE', 'HEAD'],
+  })
 
 const validateEvent = initMiddleware(
     validateMiddleware(eventDataMid, validationResult)
 )
+function checkCors(req, res, fn) {
+    return new Promise((resolve, reject) => {
+      fn(req, res, (result) => {
+        if (result instanceof Error) {
+          return reject(result)
+        }
+        return resolve(result)
+      })
+    })
+}
 
 export default async function handler(req, res) {
+    await checkCors(req, res, cors);
+
     let uid;
     try {
         const tokenDecoded = validateJWT(req);

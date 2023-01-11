@@ -5,13 +5,29 @@ import registerForm from '../../../middleware/registerForm';
 import validateMiddleware from '../../../middleware/validateFields';
 import dbConnect from '../../../lib/dbConnect';
 import { generateJWT } from '../../../helpers/jwt';
+import Cors from 'cors'
 const bcrypt = require('bcryptjs');
 
+const cors = Cors({
+    methods: ['POST', 'HEAD'],
+  })
+  
 const validateBody = initMiddleware(
     validateMiddleware(registerForm, validationResult)
 )
 
+function checkCors(req, res, fn) {
+    return new Promise((resolve, reject) => {
+      fn(req, res, (result) => {
+        if (result instanceof Error) {
+          return reject(result)
+        }
+        return resolve(result)
+      })
+    })
+}
 export default async function handler(req, res) {
+    await checkCors(req, res, cors);
     await validateBody(req, res);
 
     const { email, password } = req.body;
